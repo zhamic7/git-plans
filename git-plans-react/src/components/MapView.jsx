@@ -11,7 +11,7 @@ export default function MapView() {
   const center = { lng: -118.95258684698637, lat: 34.18334035884417 };
   const zoom = 16;
 
-  config.apiKey = "QdJSZvrw6MpZWuGeDuMe";
+  config.apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY;
 
   useEffect(() => {
     if (map.current) return;
