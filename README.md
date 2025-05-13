@@ -7,4 +7,4 @@ To test locally, "[Go Live](https://marketplace.visualstudio.com/items?itemName=
 
 Final deployment at https://zhamic7.github.io/git-plans/.
 
-
+Setting up react : https://visgl.github.io/react-maplibre/docs/get-started
