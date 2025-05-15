@@ -28,7 +28,7 @@ export default function MapView() {
 
     // Variables for which route and which day
     var route_name = "route_example";
-    var day = 2;
+    var day = 1;
     var route = allDataRaw[route_name];
     var view_locs = getRoute(route, day);
 
