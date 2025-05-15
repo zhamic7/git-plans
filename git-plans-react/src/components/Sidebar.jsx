@@ -17,6 +17,16 @@ export default function Sidebar({ onPrevDay, onNextDay, currentDay }) {
     setIsAdding(false);
   };
 
+  const handleDeleteLocation = (idx) => {
+    setLocations((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleUpdateLocation = (idx, updatedLoc) => {
+    setLocations((prev) => prev.map((loc, i) => (i === idx ? updatedLoc : loc)));
+  };
+  
+
+
   return (
     <div className="w-1/3 bg-gradient-to-b from-blue-50 to-blue-100 p-6 shadow-md overflow-y-auto">
       <div className="flex justify-between items-center mb-4">
@@ -32,12 +42,15 @@ export default function Sidebar({ onPrevDay, onNextDay, currentDay }) {
       <div className="space-y-2">
         {locations.map((loc, idx) => (
           <LocationItem
-            key={idx}
-            loc={loc}
-            idx={idx}
-            selected={selected}
-            toggleExpand={toggleExpand}
-          />
+          key={idx}
+          loc={loc}
+          idx={idx}
+          selected={selected}
+          toggleExpand={toggleExpand}
+          onDelete={handleDeleteLocation}
+          onUpdate={handleUpdateLocation}
+        />
+        
         ))}
 
         {isAdding ? (
