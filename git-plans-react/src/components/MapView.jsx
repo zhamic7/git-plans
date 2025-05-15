@@ -4,6 +4,9 @@ import { Map, Marker, config, MapStyle } from "@maptiler/sdk";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import "../styles/map.css";
 
+import { getRoute, Location } from "../data/data.js"
+import allDataRaw from "../data/data.json" assert { type: "json" }
+
 export default function MapView() {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -23,15 +26,29 @@ export default function MapView() {
       zoom: zoom,
     });
 
-    const markers = [
-      [34.18518367221783, -118.95283325589428],
-      [34.18324442509275, -118.9525757638468],
-      [34.18329323964055, -118.95214661043437]
-    ];
+    // Variables for which route and which day
+    var route_name = "route_example";
+    var day = 2;
+    var route = allDataRaw[route_name];
+    var view_locs = getRoute(route, day);
 
-    markers.forEach(([lat, lon]) => {
-      new Marker({ color: "#FF0000" })
-        .setLngLat([lon, lat])
+    // Center locations
+    var min_lat = Math.min(...view_locs.map(item => item.latitude))
+    var max_lat = Math.max(...view_locs.map(item => item.latitude))
+    var min_lng = Math.min(...view_locs.map(item => item.longitude))
+    var max_lng = Math.max(...view_locs.map(item => item.longitude))
+
+    var bounds = ([[min_lng, min_lat], [max_lng, max_lat]])
+    map.current.fitBounds(bounds, {padding: 200});
+
+    // Create markers for locations
+    view_locs.forEach(function (loc) {
+      const el = document.createElement('div');
+      el.className = 'marker';
+      el.innerHTML = '<span><b>' + (loc.order) + '</b></span>';
+      
+      new Marker({element:el})
+        .setLngLat([loc.longitude, loc.latitude])
         .addTo(map.current);
     });
   }, [center.lng, center.lat, zoom]);

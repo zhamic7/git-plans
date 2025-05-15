@@ -1,0 +1,49 @@
+{ 
+    "route_example" : [
+    {
+        "name" : "Loc 3", 
+        "latitude" : 34.18329323964055, 
+        "longitude" : -118.95214661043437, 
+        "day" : 1, 
+        "order" : 3, 
+        "view" : true
+    },
+    {
+        "name" : "Loc 1", 
+        "latitude" : 34.18518367221783, 
+        "longitude" : -118.95283325589428, 
+        "day" : 1, 
+        "order" : 1, 
+        "view" : true
+    },
+    {
+        "name" : "Loc 2", 
+        "latitude" : 34.18324442509275, 
+        "longitude" : -118.9525757638468, 
+        "day" : 1, 
+        "order" : 2, 
+        "view" : true
+    }, 
+    {
+        "name" : "Loc 4", 
+        "latitude" : 34.18724442509275, 
+        "longitude" : -118.9531757638468, 
+        "day" : 2, 
+        "order" : 1, 
+        "view" : true
+    },
+    {
+        "name" : "Loc 5", 
+        "latitude" : 34.18429323964055, 
+        "longitude" : -118.95214661043437, 
+        "day" : 1, 
+        "order" : 3, 
+        "view" : false
+    }],
+
+    "route_example2" : []
+}
+
+
+
+
