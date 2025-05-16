@@ -5,67 +5,68 @@ import Sidebar from "../components/Sidebar";
 import MapView from "../components/MapView";
 
 export default function HomePage() {
-  const [days, setDays] = useState(() => {
+  const [days, setDays] = useState([{ locations: [] }]);
+  const [currentDay, setCurrentDay] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load from localStorage on client after mount
+  useEffect(() => {
     try {
       const savedDays = localStorage.getItem("locations");
-      return savedDays ? JSON.parse(savedDays) : [{ locations: [] }];
-    } catch (error) {
-      console.error("Local storage error:", error);
-      return [{ locations: [] }];
-    }
-  });
+      const savedDay = localStorage.getItem("currentDay");
 
-//   const [currentDay, setCurrentDay] = useState(0);
-  const [currentDay, setCurrentDay] = useState(() => {
-    try {
-      const day = localStorage.getItem("currentDay");
-      return day ? JSON.parse(day) : 0;
+      if (savedDays) setDays(JSON.parse(savedDays));
+      if (savedDay) setCurrentDay(JSON.parse(savedDay));
     } catch (error) {
-      console.error("Local storage error:", error);
-      return 0;
+      console.error("Local storage load error:", error);
+    } finally {
+      setIsLoaded(true);
     }
-  });
+  }, []);
 
+  // Save to localStorage when days change
   useEffect(() => {
+    if (!isLoaded) return;
     try {
       localStorage.setItem("locations", JSON.stringify(days));
     } catch (error) {
-      console.error("Local storage error:", error);
+      console.error("Local storage save error (days):", error);
     }
-  }, [days]);
-  
+  }, [days, isLoaded]);
+
+  // Save to localStorage when currentDay changes
   useEffect(() => {
+    if (!isLoaded) return;
     try {
       localStorage.setItem("currentDay", JSON.stringify(currentDay));
     } catch (error) {
-      console.error("Local storage error:", error);
+      console.error("Local storage save error (currentDay):", error);
     }
-  }, [currentDay]);
+  }, [currentDay, isLoaded]);
 
   const addLocation = (location) => {
     const newDays = [...days];
     newDays[currentDay].locations.push({ ...location, view: true });
     setDays(newDays);
   };
-  
+
   const deleteLocation = (index) => {
     const newDays = [...days];
     newDays[currentDay].locations.splice(index, 1);
     setDays(newDays);
   };
-  
+
   const updateLocation = (index, updatedLocation) => {
     const newDays = [...days];
     newDays[currentDay].locations[index] = updatedLocation;
     setDays(newDays);
   };
-  
+
   const clearLocations = () => {
     const newDays = [...days];
     newDays[currentDay].locations = [];
     setDays(newDays);
   };
-  
 
   const changeDay = (offset) => {
     const nextDay = currentDay + offset;
@@ -80,7 +81,7 @@ export default function HomePage() {
   return (
     <div className="flex h-screen">
       <Sidebar
-        locations={days[currentDay].locations}
+        locations={days[currentDay]?.locations || []}
         onAddLocation={addLocation}
         onDeleteLocation={deleteLocation}
         onUpdateLocation={updateLocation}
@@ -88,8 +89,7 @@ export default function HomePage() {
         onPrevDay={() => changeDay(-1)}
         onNextDay={() => changeDay(1)}
         currentDay={currentDay + 1}
-        />
-
+      />
       <MapView />
     </div>
   );
