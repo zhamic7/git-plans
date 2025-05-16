@@ -42,23 +42,15 @@ export default function HomePage() {
     }
   }, [currentDay]);
 
-//   const addLocation = () => {
-//     const newDays = [...days];
-//     newDays[currentDay].locations.push({
-//       name: `Location ${newDays[currentDay].locations.length + 1}`,
-//     });
-//     setDays(newDays);
-//   };
-
   const addLocation = (location) => {
     const newDays = [...days];
-    newDays[currentDay].locations.push(location);
+    newDays[currentDay].locations.push({ ...location, view: true });
     setDays(newDays);
   };
   
   const deleteLocation = (index) => {
     const newDays = [...days];
-    newDays[currentDay].locations = newDays[currentDay].locations.filter((_, i) => i !== index);
+    newDays[currentDay].locations.splice(index, 1);
     setDays(newDays);
   };
   

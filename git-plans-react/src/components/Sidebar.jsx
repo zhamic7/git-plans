@@ -46,7 +46,7 @@ export default function Sidebar({
               selected={selected}
               toggleExpand={toggleExpand}
               onDelete={() => onDeleteLocation(idx)}
-              onUpdate={(updated) => onUpdateLocation(idx, updated)}
+              onUpdate={onUpdateLocation}
             />
           ))}
   

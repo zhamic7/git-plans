@@ -8,7 +8,7 @@ export default function AddLocationForm({ onAdd, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name.trim() && location.trim()) {
-      onAdd({ name: name.trim(), location: location.trim() });
+      onAdd({ name: name.trim(), location: location.trim(), view: true });
       setName("");
       setLocation("");
     }
