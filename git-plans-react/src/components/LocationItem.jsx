@@ -31,7 +31,7 @@ export default function LocationItem({ loc, idx, selected, toggleExpand, onDelet
             className="mr-2 accent-blue-600"
             onClick={(e) => e.stopPropagation()}
           />
-          {loc.name}
+          <span className="text-gray-800">{loc.name}</span>
         </span>
         <div className="flex gap-2">
         <button
