@@ -8,7 +8,7 @@ export default function AddLocationForm({ onAdd, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name.trim() && location.trim()) {
-      onAdd({ name: name.trim(), location: location.trim() });
+      onAdd({ name: name.trim(), location: location.trim(), view: true });
       setName("");
       setLocation("");
     }
@@ -22,7 +22,7 @@ export default function AddLocationForm({ onAdd, onCancel }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter location name"
-          className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 text-gray-800"
           required
         />
         <input
@@ -30,7 +30,7 @@ export default function AddLocationForm({ onAdd, onCancel }) {
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter location address/description"
-          className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 text-gray-800"
           required
         />
         <button

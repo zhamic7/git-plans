@@ -29,9 +29,14 @@ export default function LocationItem({ loc, idx, selected, toggleExpand, onDelet
           <input
             type="checkbox"
             className="mr-2 accent-blue-600"
+            checked={loc.view}
+            onChange={(e) => {
+              const updatedLoc = { ...loc, view: e.target.checked }; 
+              onUpdate(idx, updatedLoc); 
+            }}
             onClick={(e) => e.stopPropagation()}
           />
-          {loc.name}
+          <span className="text-gray-800">{loc.name}</span>
         </span>
         <div className="flex gap-2">
         <button

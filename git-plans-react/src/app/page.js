@@ -42,13 +42,30 @@ export default function HomePage() {
     }
   }, [currentDay]);
 
-  const addLocation = () => {
+  const addLocation = (location) => {
     const newDays = [...days];
-    newDays[currentDay].locations.push({
-      name: `Location ${newDays[currentDay].locations.length + 1}`,
-    });
+    newDays[currentDay].locations.push({ ...location, view: true });
     setDays(newDays);
   };
+  
+  const deleteLocation = (index) => {
+    const newDays = [...days];
+    newDays[currentDay].locations.splice(index, 1);
+    setDays(newDays);
+  };
+  
+  const updateLocation = (index, updatedLocation) => {
+    const newDays = [...days];
+    newDays[currentDay].locations[index] = updatedLocation;
+    setDays(newDays);
+  };
+  
+  const clearLocations = () => {
+    const newDays = [...days];
+    newDays[currentDay].locations = [];
+    setDays(newDays);
+  };
+  
 
   const changeDay = (offset) => {
     const nextDay = currentDay + offset;
@@ -65,10 +82,14 @@ export default function HomePage() {
       <Sidebar
         locations={days[currentDay].locations}
         onAddLocation={addLocation}
+        onDeleteLocation={deleteLocation}
+        onUpdateLocation={updateLocation}
+        onClearLocations={clearLocations}
         onPrevDay={() => changeDay(-1)}
         onNextDay={() => changeDay(1)}
         currentDay={currentDay + 1}
-      />
+        />
+
       <MapView />
     </div>
   );
