@@ -12,9 +12,20 @@ export default function Sidebar({
   onPrevDay,
   onNextDay,
   currentDay,
+  onBookmark,
+  bookmarks,
+  changeDay,
+  days
 }) {
   const [selected, setSelected] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [showDaySelector, setShowDaySelector] = useState(false);
+
+const handleSelectDay = (dayIndex) => {
+  setShowDaySelector(false);
+  changeDay(dayIndex - currentDay); // simulate offset
+};
+
 
   const toggleExpand = (idx) => {
     setSelected(selected === idx ? null : idx);
@@ -99,16 +110,44 @@ export default function Sidebar({
 
   return (
     <div className="w-1/3 bg-gradient-to-b from-blue-50 to-blue-100 p-6 shadow-md overflow-y-auto">
-      <div className="flex justify-between items-center mb-4">
-        <button className="text-blue-700 font-semibold" onClick={onPrevDay}>
-          &lt;&lt; prev
-        </button>
-        <h2 className="text-xl font-bold text-blue-900">DAY {currentDay}</h2>
-        <button className="text-blue-700 font-semibold" onClick={onNextDay}>
-          next &gt;&gt;
-        </button>
-      </div>
+      <div className="flex justify-between items-center mb-4 relative">
+  <button className="text-blue-700 font-semibold" onClick={onPrevDay}>
+    &lt;&lt; prev
+  </button>
 
+  <button
+    onClick={() => setShowDaySelector(!showDaySelector)}
+    className="text-xl font-bold text-blue-900 focus:outline-none"
+  >
+    DAY {currentDay}
+  </button>
+
+  <button className="text-blue-700 font-semibold" onClick={onNextDay}>
+    next &gt;&gt;
+  </button>
+
+  {showDaySelector && (
+  <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-white border border-blue-200 rounded shadow-md z-10 max-h-60 overflow-y-auto w-40">
+    {days.map((_, i) => (
+      <button
+        key={i}
+        onClick={() => handleSelectDay(i + 1)}
+        className={`block w-full px-4 py-2 text-left text-sm text-blue-900 hover:bg-blue-100 ${
+          i + 1 === currentDay ? "bg-blue-200 font-semibold" : ""
+        }`}
+      >
+        Day {i + 1}
+      </button>
+    ))}
+  </div>
+)}
+
+
+
+</div>
+
+
+{/* jsadfjhlksad;jflkasdjf */}
       <div className="space-y-2">
         {locations.map((loc, idx) => (
           <LocationItem
@@ -119,11 +158,12 @@ export default function Sidebar({
             toggleExpand={toggleExpand}
             onDelete={() => onDeleteLocation(idx)}
             onUpdate={onUpdateLocation}
+            onBookmark={onBookmark}
           />
         ))}
 
         {isAdding ? (
-          <AddLocationForm onAdd={handleAddLocation} onCancel={() => setIsAdding(false)} />
+          <AddLocationForm onAdd={handleAddLocation} onCancel={() => setIsAdding(false)} bookmarks={bookmarks}/>
         ) : (
           <button
             onClick={() => setIsAdding(true)}

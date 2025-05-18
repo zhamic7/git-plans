@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 
-export default function LocationItem({ loc, idx, selected, toggleExpand, onDelete, onUpdate }) {
+export default function LocationItem({ loc, idx, selected, toggleExpand, onDelete, onUpdate, onBookmark}) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(loc.name);
   const [editLocation, setEditLocation] = useState(loc.location);
@@ -51,6 +51,17 @@ export default function LocationItem({ loc, idx, selected, toggleExpand, onDelet
             >
             ✏️
         </button>
+
+        <button
+  className="text-green-600 hover:text-green-700"
+  onClick={(e) => {
+    e.stopPropagation();
+    onBookmark(loc);
+  }}
+>
+  Bookmark Location
+</button>
+
 
           <button
             className="text-red-500 hover:text-red-600"
