@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from "react";
 
-export default function AddLocationForm({ onAdd, onCancel }) {
+export default function AddLocationForm({ onAdd, onCancel, bookmarks = [] }) {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
+  const [selectedBookmarkIndex, setSelectedBookmarkIndex] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -11,6 +12,17 @@ export default function AddLocationForm({ onAdd, onCancel }) {
       onAdd({ name: name.trim(), location: location.trim(), view: true });
       setName("");
       setLocation("");
+      setSelectedBookmarkIndex("");
+    }
+  };
+
+  const handleBookmarkSelect = (e) => {
+    const index = e.target.value;
+    if (index !== "") {
+      const bookmark = bookmarks[parseInt(index)];
+      setName(bookmark.name);
+      setLocation(bookmark.location);
+      setSelectedBookmarkIndex(index);
     }
   };
 
@@ -33,12 +45,21 @@ export default function AddLocationForm({ onAdd, onCancel }) {
           className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 text-gray-800"
           required
         />
-        <button
-          type="button"
-          className="w-full px-3 py-2 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-50 transition"
-        >
-          Add from bookmarked locations
-        </button>
+
+        {bookmarks.length > 0 && (
+          <select
+            value={selectedBookmarkIndex}
+            onChange={handleBookmarkSelect}
+            className="w-full px-3 py-2 border border-blue-300 rounded-md text-gray-800 bg-white"
+          >
+            <option value="">📌 Select from bookmarked locations</option>
+            {bookmarks.map((b, i) => (
+              <option key={i} value={i}>
+                {b.name} – {b.location}
+              </option>
+            ))}
+          </select>
+        )}
 
         <div className="flex justify-end space-x-2">
           <button
