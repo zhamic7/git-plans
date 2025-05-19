@@ -71,6 +71,7 @@ const handleSelectDay = (dayIndex) => {
 
     onAddLocation(locWithCoords);
     setIsAdding(false);
+    window.location.reload();
   };
 
   const downloadPlanAsJSON = () => {
@@ -196,15 +197,21 @@ const handleSelectDay = (dayIndex) => {
       <div className="space-y-2">
         {locations.map((loc, idx) => (
           <LocationItem
-            key={idx}
-            loc={loc}
-            idx={idx}
-            selected={selected}
-            toggleExpand={toggleExpand}
-            onDelete={() => onDeleteLocation(idx)}
-            onUpdate={onUpdateLocation}
-            onBookmark={onBookmark}
-          />
+          key={idx}
+          loc={loc}
+          idx={idx}
+          selected={selected}
+          toggleExpand={toggleExpand}
+          onDelete={() => {
+            onDeleteLocation(idx);
+            window.location.reload();
+          }}
+          onUpdate={(updatedLoc) => {
+            onUpdateLocation(idx, updatedLoc);
+            window.location.reload();
+          }}
+          onBookmark={onBookmark}
+        />
         ))}
 
         {isAdding ? (
