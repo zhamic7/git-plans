@@ -71,20 +71,27 @@ const handleSelectDay = (dayIndex) => {
 
     onAddLocation(locWithCoords);
     setIsAdding(false);
-    window.location.reload();
   };
-
   const downloadPlanAsJSON = () => {
-    const raw = localStorage.getItem("locations");
-    if (!raw) {
-      alert("No plan data found in localStorage.");
+    const rawPlans = localStorage.getItem("plans");
+    const currentPlanName = localStorage.getItem("currentPlan");
+  
+    if (!rawPlans || !currentPlanName) {
+      alert("No current plan data found in localStorage.");
       return;
     }
-
+  
     try {
-      const parsedDays = JSON.parse(raw);
-      const flattened = parsedDays.flatMap((dayData, dayIndex) =>
-        dayData.locations
+      const plans = JSON.parse(rawPlans);
+      const currentPlan = plans[currentPlanName];
+  
+      if (!currentPlan || !Array.isArray(currentPlan.days)) {
+        alert("Current plan is invalid or missing.");
+        return;
+      }
+  
+      const flattened = currentPlan.days.flatMap((dayData, dayIndex) =>
+        (dayData.locations || [])
           .filter((loc) => loc.view !== false)
           .map((loc) => ({
             name: loc.name,
@@ -94,15 +101,16 @@ const handleSelectDay = (dayIndex) => {
             day: dayIndex + 1,
           }))
       );
-
-      const blob = new Blob([JSON.stringify({ route_example: flattened }, null, 2)], {
-        type: "application/json",
-      });
-
+  
+      const blob = new Blob(
+        [JSON.stringify({ [currentPlanName]: flattened }, null, 2)],
+        { type: "application/json" }
+      );
+  
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "plan.json";
+      a.download = `${currentPlanName.replace(/\s+/g, "_")}.json`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -110,6 +118,7 @@ const handleSelectDay = (dayIndex) => {
       alert("Failed to export plan data.");
     }
   };
+  
 
   const currentDayDate = startDate
   ? new Date(new Date(startDate + "T00:00:00").getTime() + (currentDay - 1) * 86400000).toLocaleDateString(undefined, {
@@ -204,11 +213,18 @@ const handleSelectDay = (dayIndex) => {
           toggleExpand={toggleExpand}
           onDelete={() => {
             onDeleteLocation(idx);
-            window.location.reload();
           }}
-          onUpdate={(updatedLoc) => {
-            onUpdateLocation(idx, updatedLoc);
-            window.location.reload();
+          onUpdate={async (i, updatedLoc) => {
+            const coords = await geocodeAddress(updatedLoc.location);
+            if (!coords) return;
+          
+            const updatedLocWithCoords = {
+              ...updatedLoc,
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+            };
+          
+            onUpdateLocation(i, updatedLocWithCoords);
           }}
           onBookmark={onBookmark}
         />

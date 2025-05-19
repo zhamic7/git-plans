@@ -3,17 +3,18 @@ import React, { useState } from "react";
 
 export default function LocationItem({ loc, idx, selected, toggleExpand, onDelete, onUpdate, onBookmark}) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(loc.name);
-  const [editLocation, setEditLocation] = useState(loc.location);
+  const [editName, setEditName] = useState(loc.name ?? "");
+  const [editLocation, setEditLocation] = useState(loc.location ?? "");
 
   const handleSave = () => {
+    // console.log({ ...loc, name: editName, location: editLocation })
     onUpdate(idx, { ...loc, name: editName, location: editLocation });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setEditName(loc.name);
-    setEditLocation(loc.location);
+    setEditName(loc.name ?? "");
+    setEditLocation(loc.location ?? "");
     setIsEditing(false);
   };
 
