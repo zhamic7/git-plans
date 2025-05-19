@@ -1,10 +1,30 @@
 # git-plans
 ### CS188 Final Project
 
-Uses [MapLibreGL JS](https://maplibre.org/maplibre-gl-js/docs/). To add vector data to map via geojsons for testing, check out [geojson.io](https://geojson.io/#map=2/0/20).
+Uses [MapLibreGL JS](https://maplibre.org/maplibre-gl-js/docs/) and [Next.js](https://nextjs.org). 
 
-To test locally, "[Go Live](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)" in VS code, then go to http://127.0.0.1:5500/index.html.
+## Getting Started
 
-Final deployment at https://zhamic7.github.io/git-plans/.
+After cloning this repository, run the following commands: 
+```bash
+cd git-plans-react
+npm install
+npm run dev
+```
+## Functionalities
+### Homepage
+- Create new plan
+- Import plan from json
 
-Setting up react : https://visgl.github.io/react-maplibre/docs/get-started
+### Map interface
+#### To see demonstration, watch this [video](https://drive.google.com/file/d/1u3RMgEEQ94sDDbxjsE9fuV9vMlcbTao6/view?usp=sharing).
+- Add days to route
+- Add new location to chosen day of route
+- Add location from bookmarks to chosen day of route
+- Add location to bookmarks
+- Edit added location
+- View added location information
+- Temporarily remove locations from chosen day of route
+- Permanently remove locations from chosen day of route
+- Export plan to json
+- Reset plan
