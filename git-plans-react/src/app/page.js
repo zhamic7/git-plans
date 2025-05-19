@@ -9,6 +9,8 @@ export default function HomePage() {
   const [currentDay, setCurrentDay] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+
 
   // Load from localStorage on client after mount
   useEffect(() => {
@@ -16,7 +18,10 @@ export default function HomePage() {
       const savedDays = localStorage.getItem("locations");
       const savedDay = localStorage.getItem("currentDay");
       const savedBookmarks = localStorage.getItem("bookmarks");
+      const savedStartDate = localStorage.getItem("startDate");
 
+
+      if (savedStartDate) setStartDate(savedStartDate);
       if (savedDays) setDays(JSON.parse(savedDays));
       if (savedDay) setCurrentDay(JSON.parse(savedDay));
       if (savedBookmarks) setBookmarks(JSON.parse(savedBookmarks));
@@ -36,6 +41,16 @@ export default function HomePage() {
       console.error("Local storage save error (days):", error);
     }
   }, [days, isLoaded]);
+
+  useEffect(() => {
+  if (!isLoaded) return;
+  try {
+    localStorage.setItem("startDate", startDate);
+  } catch (error) {
+    console.error("Local storage save error (startDate):", error);
+  }
+}, [startDate, isLoaded]);
+
 
   // Save to localStorage when currentDay changes
   useEffect(() => {
@@ -119,6 +134,8 @@ const addBookmark = (loc) => {
         bookmarks={bookmarks}
         changeDay={changeDay}
         days={days}
+        startDate={startDate}
+        setStartDate={setStartDate}
       />
       <MapView />
       <div className="absolute bottom-4 left-4 bg-white p-2 shadow-lg rounded max-w-xs overflow-y-auto max-h-64">
