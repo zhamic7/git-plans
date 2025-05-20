@@ -9,10 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@any-routing/annotation-plugin": "^0.0.1",
-    "@any-routing/core": "^0.1.0",
-    "@any-routing/here-data-provider": "^0.1.0",
-    "@any-routing/maplibre-engine": "^0.2.0",
     "@maplibre/maplibre-gl-directions": "^0.8.0",
     "@maptiler/sdk": "^3.2.2",
     "maplibre-gl": "^5.5.0",
