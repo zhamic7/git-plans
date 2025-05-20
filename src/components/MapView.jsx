@@ -4,15 +4,20 @@ import { Map, Marker, config, MapStyle } from "@maptiler/sdk";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import "../styles/map.css";
 
+// Import the plugin
+import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
+
 export default function MapView({ currentDay, allDays }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const markersRef = useRef([]);
+  const directions = useRef(null);
+  const points = useRef([]);
 
   config.apiKey = "QdJSZvrw6MpZWuGeDuMe";
 
-  const center = { lng: -118.95258684698637, lat: 34.18334035884417 };
-  const zoom = 16;
+  const center = { lng: -98.5556199, lat: 39.8097343 };
+  const zoom = 3;
 
   useEffect(() => {
     if (map.current) return;
@@ -23,14 +28,26 @@ export default function MapView({ currentDay, allDays }) {
       center: [center.lng, center.lat],
       zoom: zoom,
     });
+
+
   }, []);
 
   useEffect(() => {
-    if (!map.current || !Array.isArray(allDays)) return;
+    if (directions.current) return;
+    map.current.on("load", () => {
+      directions.current = new MapLibreGlDirections(map.current);
+      directions.current.interactive = false;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!map.current || !Array.isArray(allDays) || !directions.current) return;
 
     // Remove previous markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
+    //points.current.forEach(point => point.remove());
+    points.current = []
 
     let allValidLocations = [];
 
@@ -52,6 +69,11 @@ export default function MapView({ currentDay, allDays }) {
           .setLngLat([loc.longitude, loc.latitude])
           .addTo(map.current);
 
+        if (isCurrent) {
+          points.current.push([loc.longitude, loc.latitude])
+        }
+        
+
         markersRef.current.push(marker);
         allValidLocations.push(loc);
       });
@@ -69,7 +91,15 @@ export default function MapView({ currentDay, allDays }) {
 
       map.current.fitBounds(bounds, { padding: 200 });
     }
-  }, [allDays, currentDay]);
+
+    // 
+    map.current.fire('foo');
+    map.current.on("foo", () => {
+      directions.current.setWaypoints(points.current);
+    });
+
+  }, [allDays, currentDay,]);
+
 
   return (
     <div className="map-wrap">
