@@ -4,10 +4,12 @@
 Uses [MapLibreGL JS](https://maplibre.org/maplibre-gl-js/docs/) and [Next.js](https://nextjs.org). 
 
 ## Getting Started
+To use locally online, go to this [link](https://zhamic7.github.io/git-plans/) to run the application in your browser.
 
-After cloning this repository, run the following commands: 
+To run locally offline, run the following commands: 
 ```bash
-cd git-plans-react
+git clone git@github.com:zhamic7/git-plans.git
+cd git-plans
 npm install
 npm run dev
 ```
