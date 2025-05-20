@@ -1,0 +1,39 @@
+{
+  "Sample": [
+    {
+      "name": "Target",
+      "location": "10861 Weyburn Ave, Los Angeles, CA 90024",
+      "latitude": 34.0627169,
+      "longitude": -118.443724,
+      "day": 1
+    },
+    {
+      "name": "Hammer Museum",
+      "location": "10899 Wilshire Blvd, Los Angeles, CA 90024",
+      "latitude": 34.059466,
+      "longitude": -118.4437539,
+      "day": 1
+    },
+    {
+      "name": "Galleria Market",
+      "location": "3250 W Olympic Blvd, Los Angeles, CA 90006",
+      "latitude": 34.05204,
+      "longitude": -118.3085338,
+      "day": 1
+    },
+    {
+      "name": "Kinokuniya",
+      "location": "3760 S Centinela Ave, Los Angeles, CA 90066",
+      "latitude": 33.9864384,
+      "longitude": -118.4152246,
+      "day": 1
+    },
+    {
+      "name": "De Neve Commons",
+      "location": "370 De Neve Dr, Los Angeles, CA 90024",
+      "latitude": 34.0712399,
+      "longitude": -118.4508734,
+      "day": 1
+    }
+  ]
+}
