@@ -96,7 +96,7 @@ export default function PlanSelectorSidebar({
           value={newPlanName}
           onChange={(e) => setNewPlanName(e.target.value)}
           placeholder="New plan name"
-          className="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="text-gray-800 px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
         />
         <button
           type="submit"
