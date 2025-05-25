@@ -2,6 +2,18 @@
 import React, { useState } from "react";
 import LocationItem from "./LocationItem";
 import AddLocationForm from "./AddLocationForm";
+import {
+  Box,
+  Stack,
+  Button,
+  Typography,
+  Paper
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+
 
 export default function Sidebar({
   locations,
@@ -131,132 +143,160 @@ const handleSelectDay = (dayIndex) => {
 
 
 
-  return (
-    <div className="w-1/3 bg-gradient-to-b from-blue-50 to-blue-100 p-6 shadow-md overflow-y-auto">
-      <div className="relative mb-6">
-  <div className="flex justify-between items-start gap-2">
-    <button className="text-blue-700 font-semibold" onClick={onPrevDay}>
-      &lt;&lt; prev
-    </button>
+return (
+  <Box
+    sx={{
+      width: "100%",
+      maxWidth: 400,
+      bgcolor: "background.paper",
+      p: 3,
+      boxShadow: 3,
+      borderRadius: 2,
+      height: "100vh",
+      overflowY: "auto",
+    }}
+  >
+    {/* Day Navigation */}
+    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+      <Button size="small" onClick={onPrevDay} variant="text">« Prev</Button>
 
-    <div className="flex flex-col items-center text-center">
-      <button
-        onClick={() => setShowDaySelector(!showDaySelector)}
-        className="text-xl font-bold text-blue-900 focus:outline-none"
-      >
-        DAY {currentDay}
-      </button>
-      {currentDayDate && (
-        <span className="text-sm text-blue-600 font-medium mt-1">
-          {currentDayDate}
-        </span>
-      )}
-    </div>
-
-    <button className="text-blue-700 font-semibold" onClick={onNextDay}>
-      next &gt;&gt;
-    </button>
-  </div>
-
-  {/* Start date input */}
-  <div className="mt-4 px-2">
-    <label className="text-sm text-blue-900 font-medium block mb-1">Start Date (Day 1)</label>
-    <input
-      type="date"
-      className="w-full px-3 py-2 border border-blue-300 rounded-md text-blue-900 shadow-sm"
-      value={startDate || ""}
-      onChange={(e) => setStartDate(e.target.value)}
-    />
-  </div>
-
-  {/* Day selector dropdown */}
-  {showDaySelector && (
-    <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-white border border-blue-200 rounded shadow-md z-10 max-h-60 overflow-y-auto w-44">
-      {days.map((_, i) => {
-        const date = startDate
-          ? new Date(new Date(startDate + "T00:00:00").getTime() + i * 86400000).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric"
-            })
-          : null;
-
-        return (
-          <button
-            key={i}
-            onClick={() => handleSelectDay(i + 1)}
-            className={`block w-full px-4 py-2 text-left text-sm text-blue-900 hover:bg-blue-100 ${
-              i + 1 === currentDay ? "bg-blue-200 font-semibold" : ""
-            }`}
-          >
-            Day {i + 1}
-            {date && <div className="text-xs text-blue-500">{date}</div>}
-          </button>
-        );
-      })}
-    </div>
-  )}
-</div>
-
-
-
-
-
-
-{/* jsadfjhlksad;jflkasdjf */}
-      <div className="space-y-2">
-        {locations.map((loc, idx) => (
-          <LocationItem
-          key={idx}
-          loc={loc}
-          idx={idx}
-          selected={selected}
-          toggleExpand={toggleExpand}
-          onDelete={() => {
-            onDeleteLocation(idx);
-          }}
-          onUpdate={async (i, updatedLoc) => {
-            const coords = await geocodeAddress(updatedLoc.location);
-            if (!coords) return;
-          
-            const updatedLocWithCoords = {
-              ...updatedLoc,
-              latitude: coords.latitude,
-              longitude: coords.longitude,
-            };
-          
-            onUpdateLocation(i, updatedLocWithCoords);
-          }}
-          onBookmark={onBookmark}
-        />
-        ))}
-
-        {isAdding ? (
-          <AddLocationForm onAdd={handleAddLocation} onCancel={() => setIsAdding(false)} bookmarks={bookmarks}/>
-        ) : (
-          <button
-            onClick={() => setIsAdding(true)}
-            className="mt-4 p-2 w-full text-blue-600 font-medium border-2 border-dashed border-blue-300 rounded-lg hover:bg-blue-50"
-          >
-            ➕ Add Location
-          </button>
+      <Stack alignItems="center">
+        <Button onClick={() => setShowDaySelector(!showDaySelector)} variant="text" sx={{ fontWeight: "bold", fontSize: 18 }}>
+          Day {currentDay}
+        </Button>
+        {currentDayDate && (
+          <Typography variant="caption" color="text.secondary">
+            {currentDayDate}
+          </Typography>
         )}
-      </div>
+      </Stack>
 
-      <div className="mt-6 text-center space-y-2">
-        <button
-          onClick={onClearLocations}
-          className="text-sm text-red-500 hover:text-red-700"
-        >
-          🗑️ Clear All Locations
-        </button>
+      <Button size="small" onClick={onNextDay} variant="text">Next »</Button>
+    </Stack>
 
-        <button
-          onClick={downloadPlanAsJSON}
-          className="text-sm text-green-600 hover:text-green-800 underline"
+    {/* Start Date Picker */}
+    <Box mb={2}>
+      <Typography variant="subtitle2" color="text.primary" gutterBottom>
+        Start Date (Day 1)
+      </Typography>
+      <input
+        type="date"
+        value={startDate || ""}
+        onChange={(e) => setStartDate(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "8px",
+          borderRadius: "4px",
+          border: "1px solid #ccc",
+          fontSize: "14px",
+        }}
+      />
+    </Box>
+
+    {/* Day Selector Dropdown */}
+    {showDaySelector && (
+      <Paper
+        elevation={4}
+        sx={{
+          position: "absolute",
+          mt: 1,
+          zIndex: 10,
+          maxHeight: 300,
+          overflowY: "auto",
+          width: 160,
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        {days.map((_, i) => {
+          const date = startDate
+            ? new Date(new Date(startDate + "T00:00:00").getTime() + i * 86400000).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric"
+              })
+            : null;
+
+          return (
+            <Button
+              key={i}
+              fullWidth
+              variant={i + 1 === currentDay ? "contained" : "text"}
+              onClick={() => handleSelectDay(i + 1)}
+              sx={{ justifyContent: "space-between", px: 2 }}
+            >
+              Day {i + 1}
+              {date && (
+                <Typography variant="caption" sx={{ ml: 1 }}>
+                  {date}
+                </Typography>
+              )}
+            </Button>
+          );
+        })}
+      </Paper>
+    )}
+
+    {/* Locations Section */}
+    <Box mt={3} mb={2}>
+      {locations.map((loc, idx) => (
+        <Paper key={idx} variant="outlined" sx={{ p: 2, mb: 2 }}>
+          <LocationItem
+            loc={loc}
+            idx={idx}
+            selected={selected}
+            toggleExpand={toggleExpand}
+            onDelete={() => onDeleteLocation(idx)}
+            onUpdate={async (i, updatedLoc) => {
+              const coords = await geocodeAddress(updatedLoc.location);
+              if (!coords) return;
+              const updatedLocWithCoords = { ...updatedLoc, ...coords };
+              onUpdateLocation(i, updatedLocWithCoords);
+            }}
+            onBookmark={onBookmark}
+          />
+        </Paper>
+      ))}
+
+      {/* Add Location Button or Form */}
+      {isAdding ? (
+        <AddLocationForm
+          onAdd={handleAddLocation}
+          onCancel={() => setIsAdding(false)}
+          bookmarks={bookmarks}
+        />
+      ) : (
+        <Button
+          fullWidth
+          variant="outlined"
+          color="primary"
+          sx={{ borderStyle: "dashed", mt: 2 }}
+          onClick={() => setIsAdding(true)}
         >
-          ⬇️ Download Plan JSON
-        </button>
-      </div>
-    </div>
-  );
+          ➕ Add Location
+        </Button>
+      )}
+    </Box>
+
+    {/* Action Buttons */}
+    <Stack spacing={2} mt={4} alignItems="center">
+      <Button
+        variant="outlined"
+        color="error"
+        startIcon={<DeleteIcon />}
+        onClick={onClearLocations}
+      >
+        Clear All Locations
+      </Button>
+      <Button
+        variant="contained"
+        color="success"
+        startIcon={<DownloadIcon />}
+        onClick={downloadPlanAsJSON}
+      >
+        Download Plan JSON
+      </Button>
+    </Stack>
+  </Box>
+);
+
 }

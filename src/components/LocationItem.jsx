@@ -1,5 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { IconButton } from '@mui/material';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+
+
 
 export default function LocationItem({
   loc,
@@ -87,15 +92,10 @@ export default function LocationItem({
           >
             ✏️
           </button>
-          <button
-            className="text-green-600 hover:text-green-700"
-            onClick={(e) => {
-              e.stopPropagation();
-              onBookmark(loc);
-            }}
-          >
-            Bookmark Location
-          </button>
+          <IconButton onClick={() => onBookmark(loc)} color="primary">
+  {loc.bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+</IconButton>
+
           <button
             className="text-red-500 hover:text-red-600"
             onClick={(e) => {

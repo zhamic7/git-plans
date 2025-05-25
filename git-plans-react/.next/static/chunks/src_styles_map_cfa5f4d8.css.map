@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["file:///Users/chentzen02/Documents/CS188_HCI/git-plans/git-plans-react/src/styles/map.css"],"sourcesContent":[".map-wrap {\n  position: relative;\n  width: 100%;\n  height: 100vh;\n}\n\n.map {\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n\n.marker {width:0px; height:0px;}\n\n.marker  span {\n  display:flex;\n  justify-content:center;\n  align-items:center;\n  box-sizing:border-box;\n  width: 40px;\n  height: 40px;\n  font-size: 20px;\n  color:#fff;\n  background: var(--color-blue-700);\n  border:solid 4px;\n  border-radius: 0 70% 70%;\n  box-shadow:0 0 2px #000;\n  cursor: pointer;\n  transform-origin:0 0;\n  transform: rotateZ(-135deg);\n}\n\n.marker b {transform: rotateZ(135deg)}"],"names":[],"mappings":"AAAA;;;;;;AAMA;;;;;;AAMA;;;;;AAEA;;;;;;;;;;;;;;;;;;AAkBA","debugId":null}}]
+}

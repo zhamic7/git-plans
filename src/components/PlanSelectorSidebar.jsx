@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
+import { Button, Stack } from "@mui/material";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 export default function PlanSelectorSidebar({
   plans,
@@ -105,22 +107,23 @@ export default function PlanSelectorSidebar({
         </button>
       </form>
 
-      <div className="mt-4">
-        <input
-          type="file"
-          accept=".json"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="text-sm text-green-700 underline hover:text-green-900"
-        >
-          📥 Import Plan from JSON
-        </button>
-      </div>
+     <Stack direction="column" alignItems="center" sx={{ mt: 3 }}>
+      <input
+        type="file"
+        accept=".json"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+      <Button
+        variant="outlined"
+        color="primary"
+        startIcon={<UploadFileIcon />}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        Import Plan from JSON
+      </Button>
+    </Stack>
     </div>
   );
 }
