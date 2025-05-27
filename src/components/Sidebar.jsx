@@ -238,24 +238,66 @@ return (
 
     {/* Locations Section */}
     <Box mt={3} mb={2}>
-      {locations.map((loc, idx) => (
-        <Paper key={idx} variant="outlined" sx={{ p: 2, mb: 2 }}>
-          <LocationItem
-            loc={loc}
-            idx={idx}
-            selected={selected}
-            toggleExpand={toggleExpand}
-            onDelete={() => onDeleteLocation(idx)}
-            onUpdate={async (i, updatedLoc) => {
-              const coords = await geocodeAddress(updatedLoc.location);
-              if (!coords) return;
-              const updatedLocWithCoords = { ...updatedLoc, ...coords };
-              onUpdateLocation(i, updatedLocWithCoords);
-            }}
-            onBookmark={onBookmark}
-          />
-        </Paper>
-      ))}
+    {locations.map((loc, idx) => (
+  <Paper key={idx} variant="outlined" sx={{ p: 2, mb: 2 }}>
+    <Stack direction="row" alignItems="center" spacing={2}>
+    <Box sx={{ position: "relative", width: 28, height: 40 }}>
+  {/* Blue teardrop pin */}
+  <Box
+    sx={{
+      width: 28,
+      height: 28,
+      borderRadius: "50% 50% 50% 0",
+      backgroundColor: "#1E5AFF", // matched blue
+      color: "white",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 14,
+      fontWeight: 600,
+      transform: "rotate(-45deg)",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
+    }}
+  >
+    <Box sx={{ transform: "rotate(45deg)" }}>{idx + 1}</Box>
+  </Box>
+
+  {/* Purple dot below */}
+  <Box
+    sx={{
+      width: 12,
+      height: 12,
+      borderRadius: "50%",
+      backgroundColor: "rgba(160, 64, 255, 0.6)", // semi-transparent purple
+      position: "absolute",
+      bottom: -6,
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: 0,
+    }}
+  />
+</Box>
+
+
+      <Box flex={1}>
+        <LocationItem
+          loc={loc}
+          idx={idx}
+          selected={selected}
+          toggleExpand={toggleExpand}
+          onDelete={() => onDeleteLocation(idx)}
+          onUpdate={async (i, updatedLoc) => {
+            const coords = await geocodeAddress(updatedLoc.location);
+            if (!coords) return;
+            const updatedLocWithCoords = { ...updatedLoc, ...coords };
+            onUpdateLocation(i, updatedLocWithCoords);
+          }}
+          onBookmark={onBookmark}
+        />
+      </Box>
+    </Stack>
+  </Paper>
+))}
 
       {/* Add Location Button or Form */}
       {isAdding ? (
