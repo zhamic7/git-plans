@@ -86,7 +86,7 @@ export default function MapView({ currentDay, allDays }) {
       });
     });
 
-    if (allVisible.length > 0) {
+    if (allVisible.length > 1) {
       const lngs = allVisible.map(([lng]) => lng);
       const lats = allVisible.map(([_, lat]) => lat);
       const bounds = [
@@ -94,6 +94,14 @@ export default function MapView({ currentDay, allDays }) {
         [Math.max(...lngs), Math.max(...lats)],
       ];
       map.current.fitBounds(bounds, { padding: 200 });
+    }
+    else if (allVisible.length == 1) {
+      const center = allVisible[0];
+      const zoom = 15;
+      map.current.flyTo({
+        center: center,
+        zoom: zoom
+      });
     }
 
     // ⛳️ Set waypoints for routing after plugin is ready
