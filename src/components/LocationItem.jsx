@@ -82,22 +82,22 @@ export default function LocationItem({
           <span className="text-gray-800">{loc.name}</span>
         </span>
         <div className="flex gap-2">
-          <button
-            className="text-yellow-500 hover:text-yellow-600"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (selected !== idx) toggleExpand(idx);
-              setIsEditing(true);
-            }}
-          >
-            ✏️
-          </button>
+        <button
+          className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-100 transition px-2 py-1 rounded"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (selected !== idx) toggleExpand(idx);
+            setIsEditing(true);
+          }}
+        >
+          ✏️
+        </button>
           <IconButton onClick={() => onBookmark(loc)} color="primary">
   {loc.bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
 </IconButton>
 
           <button
-            className="text-red-500 hover:text-red-600"
+            className="text-red-500 hover:text-red-600 hover:bg-red-100 transition px-2 py-1 rounded"
             onClick={(e) => {
               e.stopPropagation();
               onDelete(idx);
