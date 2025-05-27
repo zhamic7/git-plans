@@ -1,24 +1,23 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Map, Marker, Popup, config, MapStyle } from "@maptiler/sdk";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import "../styles/map.css";
 
-// Import the plugin
 import MapLibreGlDirections from "@maplibre/maplibre-gl-directions";
 
 export default function MapView({ currentDay, allDays }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const markersRef = useRef([]);
-  const directions = useRef(null);
-  const points = useRef([]);
+  const directionsRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
 
   config.apiKey = "QdJSZvrw6MpZWuGeDuMe";
-
   const center = { lng: -98.5556199, lat: 39.8097343 };
   const zoom = 3;
 
+  // Initialize map and plugin
   useEffect(() => {
     if (map.current) return;
 
@@ -29,32 +28,38 @@ export default function MapView({ currentDay, allDays }) {
       zoom: zoom,
     });
 
-
-  }, []);
-
-  useEffect(() => {
-    if (directions.current) return;
     map.current.on("load", () => {
-      directions.current = new MapLibreGlDirections(map.current);
-      directions.current.interactive = false;
+      if (!directionsRef.current) {
+        const directions = new MapLibreGlDirections(map.current);
+        directions.interactive = false;
+        directionsRef.current = directions;
+      }
+      setMapReady(true); // signal map + plugin ready
     });
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+        directionsRef.current = null;
+      }
+    };
   }, []);
 
+  // Sync markers + directions when ready
   useEffect(() => {
-    if (!map.current || !Array.isArray(allDays) || !directions.current) return;
+    if (!mapReady || !map.current || !Array.isArray(allDays)) return;
 
-    // Remove previous markers
-    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
-    //points.current.forEach(point => point.remove());
-    points.current = []
 
-    let allValidLocations = [];
+    const waypoints = [];
+    const allVisible = [];
 
     allDays.forEach((dayObj, dayIdx) => {
       const isCurrent = dayIdx === currentDay;
       const locs = (dayObj.locations || []).filter(
-        loc =>
+        (loc) =>
           typeof loc.latitude === "number" &&
           typeof loc.longitude === "number" &&
           loc.view !== false
@@ -65,45 +70,39 @@ export default function MapView({ currentDay, allDays }) {
         el.className = isCurrent ? "marker marker-current" : "marker marker-other";
         el.innerHTML = `<span><b>${idx + 1}</b></span>`;
 
-        const popup = new Popup({ offset: 25 }).setText(
-          `${loc.name} (${loc.location})`
-        );
+        const popup = new Popup({ offset: 25 }).setText(`${loc.name} (${loc.location})`);
+
         const marker = new Marker({ element: el })
           .setLngLat([loc.longitude, loc.latitude])
-          .setPopup(popup) // Add popups
+          .setPopup(popup)
           .addTo(map.current);
 
-        if (isCurrent) {
-          points.current.push([loc.longitude, loc.latitude])
-          map.current.fire('foo');
-        }
-        
         markersRef.current.push(marker);
-        allValidLocations.push(loc);
+        allVisible.push([loc.longitude, loc.latitude]);
+
+        if (isCurrent) {
+          waypoints.push([loc.longitude, loc.latitude]);
+        }
       });
     });
 
-    // Fit bounds if we have markers
-    if (allValidLocations.length > 0) {
-      const lats = allValidLocations.map(loc => loc.latitude);
-      const lngs = allValidLocations.map(loc => loc.longitude);
-
+    if (allVisible.length > 0) {
+      const lngs = allVisible.map(([lng]) => lng);
+      const lats = allVisible.map(([_, lat]) => lat);
       const bounds = [
         [Math.min(...lngs), Math.min(...lats)],
         [Math.max(...lngs), Math.max(...lats)],
       ];
-
       map.current.fitBounds(bounds, { padding: 200 });
     }
 
-    // 
-    
-    map.current.on("foo", () => {
-      directions.current.setWaypoints(points.current);
-    });
-
-  }, [allDays, currentDay,]);
-
+    // ⛳️ Set waypoints for routing after plugin is ready
+    if (directionsRef.current) {
+      directionsRef.current.setWaypoints(
+        waypoints.length >= 2 ? waypoints : []
+      );
+    }
+  }, [mapReady, allDays, currentDay]);
 
   return (
     <div className="map-wrap">
