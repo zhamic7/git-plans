@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useEffect } from "react";
-import { Map, Marker, config, MapStyle } from "@maptiler/sdk";
+import { Map, Marker, Popup, config, MapStyle } from "@maptiler/sdk";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import "../styles/map.css";
 
@@ -65,15 +65,19 @@ export default function MapView({ currentDay, allDays }) {
         el.className = isCurrent ? "marker marker-current" : "marker marker-other";
         el.innerHTML = `<span><b>${idx + 1}</b></span>`;
 
+        const popup = new Popup({ offset: 25 }).setText(
+          `${loc.name} (${loc.location})`
+        );
         const marker = new Marker({ element: el })
           .setLngLat([loc.longitude, loc.latitude])
+          .setPopup(popup) // Add popups
           .addTo(map.current);
 
         if (isCurrent) {
           points.current.push([loc.longitude, loc.latitude])
+          map.current.fire('foo');
         }
         
-
         markersRef.current.push(marker);
         allValidLocations.push(loc);
       });
@@ -93,7 +97,7 @@ export default function MapView({ currentDay, allDays }) {
     }
 
     // 
-    map.current.fire('foo');
+    
     map.current.on("foo", () => {
       directions.current.setWaypoints(points.current);
     });
