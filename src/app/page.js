@@ -46,9 +46,18 @@ export default function HomePage() {
     localStorage.setItem("currentPlan", currentPlanName);
   }, [days, bookmarks, startDate, currentPlanName, isLoaded]);
 
+//   const addLocation = (location) => {
+//     const newDays = [...days];
+//     newDays[currentDay].locations.push({ ...location, view: true });
+//     setDays(newDays);
+//   };
   const addLocation = (location) => {
     const newDays = [...days];
-    newDays[currentDay].locations.push({ ...location, view: true });
+    newDays[currentDay].locations.push({ 
+      ...location, 
+      view: true,
+      id: Date.now() // Add a unique ID
+    });
     setDays(newDays);
   };
 
@@ -178,6 +187,26 @@ export default function HomePage() {
     setSidebarMode("locations");
   };
 
+  const handleLocationReorder = (newLocations) => {
+    console.log('Received new order in parent:', newLocations); // Debug log
+    const newDays = [...days];
+    newDays[currentDay].locations = newLocations;
+    setDays(newDays);
+  };
+// const handleLocationReorder = (newLocations) => {
+//     console.log('Received new order in parent:', newLocations); // Debug log
+    
+//     setDays(prevDays => {
+//       const newDays = [...prevDays];
+//       newDays[currentDay] = {
+//         ...newDays[currentDay],
+//         locations: newLocations
+//       };
+//       console.log('Rnewdays:', newDays);
+//       return newDays;
+//     });
+//   };
+
   return (
     <div className="flex h-screen relative">
       {Object.keys(plans).length > 0 && (
@@ -216,6 +245,7 @@ export default function HomePage() {
           days={days}
           startDate={startDate}
           setStartDate={setStartDate}
+          onUpdateLocationOrder={handleLocationReorder}
         />
       ) : (
         <PlanSelectorSidebar

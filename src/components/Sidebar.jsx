@@ -13,7 +13,18 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DownloadIcon from "@mui/icons-material/Download";
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 export default function Sidebar({
   locations,
@@ -30,16 +41,52 @@ export default function Sidebar({
   days,
   startDate,
   setStartDate,
+  onUpdateLocationOrder,
 }) {
   const [selected, setSelected] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [showDaySelector, setShowDaySelector] = useState(false);
 
-const handleSelectDay = (dayIndex) => {
-  setShowDaySelector(false);
-  changeDay(dayIndex - currentDay); // simulate offset
-};
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before dragging starts
+      },
+    }),
+  );
 
+//   const handleDragEnd = (event) => {
+//     const { active, over } = event;
+    
+//     if (active.id !== over.id) {
+//       const oldIndex = locations.findIndex(loc => loc.id === active.id);
+//       const newIndex = locations.findIndex(loc => loc.id === over.id);
+      
+//       const newLocations = arrayMove(locations, oldIndex, newIndex);
+//       onUpdateLocationOrder(newLocations);
+//     }
+//   };
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    
+    if (active.id !== over.id) {
+      const oldIndex = locations.findIndex(loc => loc.id === active.id);
+      const newIndex = locations.findIndex(loc => loc.id === over.id);
+      console.log('oldIndex:', oldIndex);
+      console.log('newIndex:', newIndex);
+      // Create a new array with the moved item
+      const newLocations = arrayMove(locations, oldIndex, newIndex);
+      
+      // Update the state through the prop
+      onUpdateLocationOrder(newLocations);
+      console.log('New locations order:', newLocations);
+    }
+  };
+
+  const handleSelectDay = (dayIndex) => {
+    setShowDaySelector(false);
+    changeDay(dayIndex - currentDay);
+  };
 
   const toggleExpand = (idx) => {
     setSelected(selected === idx ? null : idx);
@@ -84,24 +131,25 @@ const handleSelectDay = (dayIndex) => {
     onAddLocation(locWithCoords);
     setIsAdding(false);
   };
+
   const downloadPlanAsJSON = () => {
     const rawPlans = localStorage.getItem("plans");
     const currentPlanName = localStorage.getItem("currentPlan");
-  
+
     if (!rawPlans || !currentPlanName) {
       alert("No current plan data found in localStorage.");
       return;
     }
-  
+
     try {
       const plans = JSON.parse(rawPlans);
       const currentPlan = plans[currentPlanName];
-  
+
       if (!currentPlan || !Array.isArray(currentPlan.days)) {
         alert("Current plan is invalid or missing.");
         return;
       }
-  
+
       const flattened = currentPlan.days.flatMap((dayData, dayIndex) =>
         (dayData.locations || [])
           .filter((loc) => loc.view !== false)
@@ -113,12 +161,12 @@ const handleSelectDay = (dayIndex) => {
             day: dayIndex + 1,
           }))
       );
-  
+
       const blob = new Blob(
         [JSON.stringify({ [currentPlanName]: flattened }, null, 2)],
         { type: "application/json" }
       );
-  
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -130,174 +178,179 @@ const handleSelectDay = (dayIndex) => {
       alert("Failed to export plan data.");
     }
   };
-  
 
   const currentDayDate = startDate
-  ? new Date(new Date(startDate + "T00:00:00").getTime() + (currentDay - 1) * 86400000).toLocaleDateString(undefined, {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  : null;
+    ? new Date(new Date(startDate + "T00:00:00").getTime() + (currentDay - 1) * 86400000).toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
 
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 400,
+        bgcolor: "background.paper",
+        p: 3,
+        boxShadow: 3,
+        borderRadius: 2,
+        height: "100vh",
+        overflowY: "auto",
+      }}
+    >
+      {/* Day Navigation */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+        <Button size="small" onClick={onPrevDay} variant="text">« Prev</Button>
 
+        <Stack alignItems="center">
+          <Button onClick={() => setShowDaySelector(!showDaySelector)} variant="text" sx={{ fontWeight: "bold", fontSize: 18 }}>
+            Day {currentDay}
+          </Button>
+          {currentDayDate && (
+            <Typography variant="caption" color="text.secondary">
+              {currentDayDate}
+            </Typography>
+          )}
+        </Stack>
 
-return (
-  <Box
-    sx={{
-      width: "100%",
-      maxWidth: 400,
-      bgcolor: "background.paper",
-      p: 3,
-      boxShadow: 3,
-      borderRadius: 2,
-      height: "100vh",
-      overflowY: "auto",
-    }}
-  >
-    {/* Day Navigation */}
-    <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-      <Button size="small" onClick={onPrevDay} variant="text">« Prev</Button>
-
-      <Stack alignItems="center">
-        <Button onClick={() => setShowDaySelector(!showDaySelector)} variant="text" sx={{ fontWeight: "bold", fontSize: 18 }}>
-          Day {currentDay}
-        </Button>
-        {currentDayDate && (
-          <Typography variant="caption" color="text.secondary">
-            {currentDayDate}
-          </Typography>
-        )}
+        <Button size="small" onClick={onNextDay} variant="text">Next »</Button>
       </Stack>
 
-      <Button size="small" onClick={onNextDay} variant="text">Next »</Button>
-    </Stack>
-
-    {/* Start Date Picker */}
-    <Box mb={2}>
-      <Typography variant="subtitle2" color="text.primary" gutterBottom>
-        Start Date (Day 1)
-      </Typography>
-      <input
-        type="date"
-        value={startDate || ""}
-        onChange={(e) => setStartDate(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "8px",
-          borderRadius: "4px",
-          border: "1px solid #ccc",
-          fontSize: "14px",
-        }}
-      />
-    </Box>
-
-    {/* Day Selector Dropdown */}
-    {showDaySelector && (
-      <Paper
-        elevation={4}
-        sx={{
-          position: "absolute",
-          mt: 1,
-          zIndex: 10,
-          maxHeight: 300,
-          overflowY: "auto",
-          width: 160,
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}
-      >
-        {days.map((_, i) => {
-          const date = startDate
-            ? new Date(new Date(startDate + "T00:00:00").getTime() + i * 86400000).toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric"
-              })
-            : null;
-
-          return (
-            <Button
-              key={i}
-              fullWidth
-              variant={i + 1 === currentDay ? "contained" : "text"}
-              onClick={() => handleSelectDay(i + 1)}
-              sx={{ justifyContent: "space-between", px: 2 }}
-            >
-              Day {i + 1}
-              {date && (
-                <Typography variant="caption" sx={{ ml: 1 }}>
-                  {date}
-                </Typography>
-              )}
-            </Button>
-          );
-        })}
-      </Paper>
-    )}
-
-    {/* Locations Section */}
-    <Box mt={3} mb={2}>
-    {locations.map((loc, idx) => (
-  <Paper key={idx} variant="outlined" sx={{ p: 2, mb: 2 }}>
-    <Stack direction="row" alignItems="center" spacing={2}>
-    <Box sx={{ position: "relative", width: 28, height: 40 }}>
-  {/* Blue teardrop pin */}
-  <Box
-    sx={{
-      width: 28,
-      height: 28,
-      borderRadius: "50% 50% 50% 0",
-      backgroundColor: "#1E5AFF", // matched blue
-      color: "white",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: 14,
-      fontWeight: 600,
-      transform: "rotate(-45deg)",
-      boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
-    }}
-  >
-    <Box sx={{ transform: "rotate(45deg)" }}>{idx + 1}</Box>
-  </Box>
-
-  {/* Purple dot below */}
-  <Box
-    sx={{
-      width: 12,
-      height: 12,
-      borderRadius: "50%",
-      backgroundColor: "rgba(160, 64, 255, 0.6)", // semi-transparent purple
-      position: "absolute",
-      bottom: -6,
-      left: "50%",
-      transform: "translateX(-50%)",
-      zIndex: 0,
-    }}
-  />
-</Box>
-
-
-      <Box flex={1}>
-        <LocationItem
-          loc={loc}
-          idx={idx}
-          selected={selected}
-          toggleExpand={toggleExpand}
-          onDelete={() => onDeleteLocation(idx)}
-          onUpdate={async (i, updatedLoc) => {
-            const coords = await geocodeAddress(updatedLoc.location);
-            if (!coords) return;
-            const updatedLocWithCoords = { ...updatedLoc, ...coords };
-            onUpdateLocation(i, updatedLocWithCoords);
+      {/* Start Date Picker */}
+      <Box mb={2}>
+        <Typography variant="subtitle2" color="text.primary" gutterBottom>
+          Start Date (Day 1)
+        </Typography>
+        <input
+          type="date"
+          value={startDate || ""}
+          onChange={(e) => setStartDate(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "8px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            fontSize: "14px",
           }}
-          onBookmark={onBookmark}
         />
       </Box>
-    </Stack>
-  </Paper>
-))}
+
+      {/* Day Selector Dropdown */}
+      {showDaySelector && (
+        <Paper
+          elevation={4}
+          sx={{
+            position: "absolute",
+            mt: 1,
+            zIndex: 10,
+            maxHeight: 300,
+            overflowY: "auto",
+            width: 160,
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          {days.map((_, i) => {
+            const date = startDate
+              ? new Date(new Date(startDate + "T00:00:00").getTime() + i * 86400000).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric"
+                })
+              : null;
+
+            return (
+              <Button
+                key={i}
+                fullWidth
+                variant={i === currentDay ? "contained" : "text"}
+                onClick={() => handleSelectDay(i)}
+                sx={{ justifyContent: "space-between", px: 2 }}
+              >
+                Day {i + 1}
+                {date && (
+                  <Typography variant="caption" sx={{ ml: 1 }}>
+                    {date}
+                  </Typography>
+                )}
+              </Button>
+            );
+          })}
+        </Paper>
+      )}
+
+      {/* Locations Section with DnD */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={locations.map((loc, idx) => ({ id: loc.id || idx, ...loc }))}
+          strategy={verticalListSortingStrategy}
+        >
+          <Box mt={3} mb={2}>
+            {locations.map((loc, idx) => (
+              <Paper key={loc.id || idx} variant="outlined" sx={{ p: 2, mb: 2 }}>
+                <Stack direction="row" alignItems="center" spacing={2}>
+                  <Box sx={{ position: "relative", width: 28, height: 40 }}>
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: "50% 50% 50% 0",
+                        backgroundColor: "#1E5AFF",
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        transform: "rotate(-45deg)",
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
+                      }}
+                    >
+                      <Box sx={{ transform: "rotate(45deg)" }}>{idx + 1}</Box>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        backgroundColor: "rgba(160, 64, 255, 0.6)",
+                        position: "absolute",
+                        bottom: -6,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        zIndex: 0,
+                      }}
+                    />
+                  </Box>
+                  <Box flex={1}>
+                    <LocationItem
+                      loc={loc}
+                      idx={idx}
+                      id={loc.id || idx}
+                      selected={selected}
+                      toggleExpand={toggleExpand}
+                      onDelete={() => onDeleteLocation(idx)}
+                      onUpdate={async (i, updatedLoc) => {
+                        const coords = await geocodeAddress(updatedLoc.location);
+                        if (!coords) return;
+                        const updatedLocWithCoords = { ...updatedLoc, ...coords };
+                        onUpdateLocation(i, updatedLocWithCoords);
+                      }}
+                      onBookmark={onBookmark}
+                    />
+                  </Box>
+                </Stack>
+              </Paper>
+            ))}
+          </Box>
+        </SortableContext>
+      </DndContext>
 
       {/* Add Location Button or Form */}
       {isAdding ? (
@@ -317,28 +370,26 @@ return (
           ➕ Add Location
         </Button>
       )}
+
+      {/* Action Buttons */}
+      <Stack spacing={2} mt={4} alignItems="center">
+        <Button
+          variant="outlined"
+          color="error"
+          startIcon={<DeleteIcon />}
+          onClick={onClearLocations}
+        >
+          Clear All Locations
+        </Button>
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<DownloadIcon />}
+          onClick={downloadPlanAsJSON}
+        >
+          Download Plan JSON
+        </Button>
+      </Stack>
     </Box>
-
-    {/* Action Buttons */}
-    <Stack spacing={2} mt={4} alignItems="center">
-      <Button
-        variant="outlined"
-        color="error"
-        startIcon={<DeleteIcon />}
-        onClick={onClearLocations}
-      >
-        Clear All Locations
-      </Button>
-      <Button
-        variant="contained"
-        color="success"
-        startIcon={<DownloadIcon />}
-        onClick={downloadPlanAsJSON}
-      >
-        Download Plan JSON
-      </Button>
-    </Stack>
-  </Box>
-);
-
+  );
 }

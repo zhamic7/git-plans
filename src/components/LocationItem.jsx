@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { IconButton } from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-
-
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export default function LocationItem({
   loc,
@@ -14,11 +14,28 @@ export default function LocationItem({
   onDelete,
   onUpdate,
   onBookmark,
+  id,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(loc.name ?? "");
   const [editLocation, setEditLocation] = useState(loc.location ?? "");
   const [suggestions, setSuggestions] = useState([]);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 100 : 'auto',
+  };
 
   const handleSave = () => {
     onUpdate(idx, { ...loc, name: editName, location: editLocation });
@@ -51,7 +68,7 @@ export default function LocationItem({
       } catch (err) {
         console.error("Nominatim error:", err);
       }
-    }, 300); // debounce
+    }, 300);
 
     return () => clearTimeout(timeout);
   }, [editLocation, isEditing]);
@@ -62,7 +79,13 @@ export default function LocationItem({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-blue-200 overflow-visible relative">
+    <div 
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="bg-white rounded-lg border border-blue-200 overflow-visible relative"
+    >
       <div
         className={`flex items-center justify-between px-4 py-2 cursor-pointer transition-all duration-150 ${
           selected === idx ? "bg-blue-100" : "hover:bg-blue-50"
@@ -82,20 +105,22 @@ export default function LocationItem({
           <span className="text-gray-800">{loc.name}</span>
         </span>
         <div className="flex gap-2">
-        <button
-          className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-100 transition px-2 py-1 rounded"
-          onClick={(e) => {
+          <button
+            className="text-yellow-500 hover:text-yellow-600 hover:bg-yellow-100 transition px-2 py-1 rounded"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (selected !== idx) toggleExpand(idx);
+              setIsEditing(true);
+            }}
+          >
+            ✏️
+          </button>
+          <IconButton onClick={(e) => {
             e.stopPropagation();
-            if (selected !== idx) toggleExpand(idx);
-            setIsEditing(true);
-          }}
-        >
-          ✏️
-        </button>
-          <IconButton onClick={() => onBookmark(loc)} color="primary">
-  {loc.bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-</IconButton>
-
+            onBookmark(loc);
+          }} color="primary">
+            {loc.bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+          </IconButton>
           <button
             className="text-red-500 hover:text-red-600 hover:bg-red-100 transition px-2 py-1 rounded"
             onClick={(e) => {
@@ -109,67 +134,67 @@ export default function LocationItem({
       </div>
 
       {selected === idx && (
-  <div className="px-4 py-2 bg-blue-50 text-sm text-blue-900 relative overflow-visible">
-    {isEditing ? (
-      <div className="space-y-2">
-        <input
-          type="text"
-          value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          className="w-full px-2 py-1 border rounded"
-        />
-        <div className="relative overflow-visible">
-          <input
-            type="text"
-            value={editLocation}
-            onChange={(e) => setEditLocation(e.target.value)}
-            className="w-full px-2 py-1 border rounded"
-          />
-          {suggestions.length > 0 && (
-            <ul className="absolute z-50 bg-white border border-blue-200 rounded mt-1 w-full max-h-60 overflow-y-auto shadow-lg">
-              {suggestions.map((s, i) => (
-                <li
-                  key={i}
-                  onClick={() => handleSuggestionClick(s)}
-                  className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700"
+        <div className="px-4 py-2 bg-blue-50 text-sm text-blue-900 relative overflow-visible">
+          {isEditing ? (
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="w-full px-2 py-1 border rounded"
+              />
+              <div className="relative overflow-visible">
+                <input
+                  type="text"
+                  value={editLocation}
+                  onChange={(e) => setEditLocation(e.target.value)}
+                  className="w-full px-2 py-1 border rounded"
+                />
+                {suggestions.length > 0 && (
+                  <ul className="absolute z-50 bg-white border border-blue-200 rounded mt-1 w-full max-h-60 overflow-y-auto shadow-lg">
+                    {suggestions.map((s, i) => (
+                      <li
+                        key={i}
+                        onClick={() => handleSuggestionClick(s)}
+                        className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-700"
+                      >
+                        {s.display_name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                  onClick={handleCancel}
                 >
-                  {s.display_name}
-                </li>
-              ))}
-            </ul>
+                  Cancel
+                </button>
+                <button
+                  className="text-sm text-blue-600 font-medium hover:underline"
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {loc.location && (
+                <p className="mb-2">
+                  <strong>Location:</strong> {loc.location}
+                </p>
+              )}
+              <ul className="list-disc list-inside">
+                <li>Route info</li>
+                <li>Estimated time</li>
+                <li>Notes...</li>
+              </ul>
+            </>
           )}
         </div>
-        <div className="flex justify-end gap-2">
-          <button
-            className="text-sm text-gray-500 hover:text-gray-700"
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
-          <button
-            className="text-sm text-blue-600 font-medium hover:underline"
-            onClick={handleSave}
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    ) : (
-      <>
-        {loc.location && (
-          <p className="mb-2">
-            <strong>Location:</strong> {loc.location}
-          </p>
-        )}
-        <ul className="list-disc list-inside">
-          <li>Route info</li>
-          <li>Estimated time</li>
-          <li>Notes...</li>
-        </ul>
-      </>
-    )}
-  </div>
-)}
+      )}
     </div>
   );
 }
