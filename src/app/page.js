@@ -232,7 +232,7 @@ export default function HomePage() {
       <MapView currentDay={currentDay} allDays={days} />
 
       <div className="absolute bottom-4 left-4 bg-white p-2 shadow-lg rounded max-w-xs overflow-y-auto max-h-64">
-        <h4 className="font-semibold mb-1">Bookmarks</h4>
+        <h4 className="font-semibold mb-1 text-black">Bookmarks</h4>
         <ul className="text-sm text-gray-700 list-disc pl-4">
           {bookmarks.map((b, i) => (
             <li key={i}>{b.name} – {b.location}</li>
