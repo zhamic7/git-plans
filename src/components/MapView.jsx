@@ -70,12 +70,12 @@ export default function MapView({ currentDay, allDays }) {
         el.className = isCurrent ? "marker marker-current" : "marker marker-other";
         el.innerHTML = `<span><b>${idx + 1}</b></span>`;
 
-const popup = new Popup({ offset: 25 }).setHTML(`
-  <div style="color: black; font-size: 14px;">
-    <strong>${loc.name}</strong><br/>
-    <small>${loc.location}</small>
-  </div>
-`);
+        const popup = new Popup({ offset: 25 }).setHTML(`
+          <div style="color: black; font-size: 14px;">
+            <strong>${loc.name} (Day ${idx + 1})</strong><br/>
+            <small>${loc.location}</small>
+          </div>
+        `);
 
 
         const marker = new Marker({ element: el })

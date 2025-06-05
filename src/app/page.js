@@ -4,6 +4,10 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import MapView from "../components/MapView";
 import PlanSelectorSidebar from "../components/PlanSelectorSidebar"; // You’ll need to create this
+import {Button} from 'react-bootstrap'
+import { IconButton } from '@mui/material';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
 export default function HomePage() {
   const [plans, setPlans] = useState({});
@@ -14,6 +18,12 @@ export default function HomePage() {
   const [startDate, setStartDate] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [sidebarMode, setSidebarMode] = useState("plans"); // "plans" or "locations"
+
+  const [isShowBody, setIsSHowBody] = React.useState(true);
+
+  const onClickHandler = () => {
+    setIsSHowBody(isShowBody => !isShowBody);
+  }
 
   // Load plans from localStorage
   useEffect(() => {
@@ -117,7 +127,7 @@ export default function HomePage() {
       alert("Invalid or duplicate plan name.");
       return;
     }
-  
+
     const newPlan = { days: [{ locations: [] }], bookmarks: [], startDate: null };
     setPlans((prev) => ({ ...prev, [name]: newPlan }));
     setCurrentPlanName(name);
@@ -129,25 +139,25 @@ export default function HomePage() {
   };
 
   const handleDeletePlan = (planName) => {
-  
+
     const newPlans = { ...plans };
     delete newPlans[planName];
-  
+
     // Save the updated plans to localStorage
     localStorage.setItem("plans", JSON.stringify(newPlans));
-  
+
     // If the deleted plan was the current one
     if (planName === currentPlanName) {
       setCurrentPlanName(null);
       localStorage.removeItem("currentPlan");
-  
+
       setDays([{ locations: [] }]);
       setBookmarks([]);
       setStartDate(null);
       setCurrentDay(0);
       setSidebarMode("plans");
     }
-  
+
     // Update state
     setPlans(newPlans);
   };
@@ -155,20 +165,20 @@ export default function HomePage() {
   const handleImportPlan = (planName, importedPlan) => {
     const rawPlans = localStorage.getItem("plans") || "{}";
     const existingPlans = JSON.parse(rawPlans);
-  
+
     if (existingPlans[planName]) {
       const confirmOverwrite = confirm(`Plan "${planName}" already exists. Overwrite it?`);
       if (!confirmOverwrite) return;
     }
-  
+
     const updatedPlans = {
       ...existingPlans,
       [planName]: importedPlan,
     };
-  
+
     localStorage.setItem("plans", JSON.stringify(updatedPlans));
     localStorage.setItem("currentPlan", planName);
-  
+
     setPlans(updatedPlans);
     setCurrentPlanName(planName);
     setDays(importedPlan.days);
@@ -182,20 +192,20 @@ export default function HomePage() {
     <div className="flex h-screen relative">
       {Object.keys(plans).length > 0 && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-row items-center space-x-3 bg-white px-4 py-2 rounded shadow border border-gray-200">
-  {sidebarMode === "locations" && currentPlanName && (
-    <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">
-      📌 {currentPlanName}
-    </div>
-  )}
-  <button
-    onClick={() =>
-      setSidebarMode((prev) => (prev === "locations" ? "plans" : "locations"))
-    }
-    className="px-3 py-1 bg-blue-600 text-white rounded shadow hover:bg-blue-700 text-sm whitespace-nowrap"
-  >
-    {sidebarMode === "locations" ? "📂 Switch Plans" : "📍 Back to Planner"}
-  </button>
-</div>
+          {sidebarMode === "locations" && currentPlanName && (
+            <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">
+              📌 {currentPlanName}
+            </div>
+          )}
+          <button
+            onClick={() =>
+              setSidebarMode((prev) => (prev === "locations" ? "plans" : "locations"))
+            }
+            className="px-3 py-1 bg-blue-600 text-white rounded shadow hover:bg-blue-700 text-sm whitespace-nowrap"
+          >
+            {sidebarMode === "locations" ? "📂 Switch Plans" : "📍 Back to Planner"}
+          </button>
+        </div>
 
       )}
 
@@ -231,13 +241,24 @@ export default function HomePage() {
 
       <MapView currentDay={currentDay} allDays={days} />
 
+
       <div className="absolute bottom-4 left-4 bg-white p-2 shadow-lg rounded max-w-xs overflow-y-auto max-h-64">
-        <h4 className="font-semibold mb-1 text-black">Bookmarks</h4>
-        <ul className="text-sm text-gray-700 list-disc pl-4">
-          {bookmarks.map((b, i) => (
-            <li key={i}>{b.name} – {b.location}</li>
-          ))}
-        </ul>
+        <div className="content-header">
+          <div style={{ margin: 5 }}>
+            <h4 className="font-semibold mb-1 text-black">
+              { isShowBody && <span>Bookmarks&nbsp;</span>}
+              <IconButton style={{ marginBottom: 3}} ><BookmarkBorderIcon onClick={onClickHandler} color="primary"></BookmarkBorderIcon></IconButton>  
+            </h4>
+          </div>
+          
+        </div>
+        { isShowBody && <div className="content-body">
+          <ul className="text-sm text-gray-700 list-disc pl-4">
+                {bookmarks.map((b, i) => (
+                  <li key={i}>{b.name} – {b.location}</li>
+                ))}
+            </ul>
+        </div>}
       </div>
     </div>
   );

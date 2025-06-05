@@ -161,11 +161,11 @@ export default function LocationItem({
             <strong>Location:</strong> {loc.location}
           </p>
         )}
-        <ul className="list-disc list-inside">
+        {/* <ul className="list-disc list-inside">
           <li>Route info</li>
           <li>Estimated time</li>
           <li>Notes...</li>
-        </ul>
+        </ul> */}
       </>
     )}
   </div>
