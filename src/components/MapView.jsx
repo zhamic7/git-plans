@@ -72,7 +72,7 @@ export default function MapView({ currentDay, allDays }) {
 
         const popup = new Popup({ offset: 25 }).setHTML(`
           <div style="color: black; font-size: 14px;">
-            <strong>${loc.name} (Day ${idx + 1})</strong><br/>
+            <strong>${loc.name} (Day ${dayIdx + 1})</strong><br/>
             <small>${loc.location}</small>
           </div>
         `);
