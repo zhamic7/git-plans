@@ -1,10 +1,10 @@
 # git-plans
 
-### CS188 Final Project
-
-Uses [MapLibreGL JS](https://maplibre.org/maplibre-gl-js/docs/) and [Next.js](https://nextjs.org). 
+### CS188 Final Project: Pigeon!
 
 <img src="public/logo.png" width="120"/> 
+
+Uses [MapLibreGL JS](https://maplibre.org/maplibre-gl-js/docs/) and [Next.js](https://nextjs.org). To see a more in-depth description of this system, go to our [blog post](./blog-post.md).
 
 ## Getting Started
 To use locally online, go to this [link](https://zhamic7.github.io/git-plans/) to run the application in your browser.
